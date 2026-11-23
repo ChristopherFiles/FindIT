@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dashboard admin FindIt Campus">
+    <title>Admin — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="page-shell admin-shell">
+    <section class="page-intro admin-intro"><p class="eyebrow">RUANG PENGELOLA</p><h1>Dashboard <em>admin.</em></h1><p>Kelola komunitas FindIt dan pastikan setiap laporan ditangani dengan baik.</p></section>
+    <div th:replace="~{fragments/alerts :: messages}"></div>
+    <section class="admin-stats" aria-label="Ringkasan">
+        <article class="admin-stat"><span class="admin-stat-icon">♙</span><div><strong th:text="${userCount}">0</strong><small>Pengguna terdaftar</small></div></article>
+        <article class="admin-stat"><span class="admin-stat-icon">▤</span><div><strong th:text="${reportCount}">0</strong><small>Total laporan</small></div></article>
+        <article class="admin-stat"><span class="admin-stat-icon">◷</span><div><strong th:text="${pendingClaimCount}">0</strong><small>Klaim menunggu</small></div></article>
+    </section>
+    <nav class="admin-anchor-nav" aria-label="Bagian dashboard"><a href="#laporan">Moderasi laporan</a><a href="#pengguna">Pengguna &amp; role</a></nav>
+
+    <section id="laporan" class="admin-section">
+        <div class="section-heading"><div><p class="eyebrow">MODERASI</p><h2>Semua laporan</h2></div><span class="admin-count" th:text="${reports.size() + ' laporan'}">0 laporan</span></div>
+        <div class="admin-table-wrap" th:if="${!reports.isEmpty()}">
+            <table class="admin-table">
+                <thead><tr><th>Barang</th><th>Jenis</th><th>Pelapor</th><th>Lokasi</th><th>Status</th><th>Aksi</th></tr></thead>
+                <tbody>
+                <tr th:each="report : ${reports}">
+                    <td data-label="Barang"><a class="admin-item-link" th:href="@{/reports/{id}(id=${report.id})}" th:text="${report.title}">Nama barang</a><small class="table-subtext" th:text="${report.category.label}">Kategori</small></td>
+                    <td data-label="Jenis"><span class="table-pill" th:classappend="${report.type.name() == 'FOUND' ? ' pill-found' : ' pill-lost'}" th:text="${report.type.name() == 'FOUND' ? 'Ditemukan' : 'Hilang'}">Jenis</span></td>
+                    <td data-label="Pelapor" th:text="${report.owner.fullName}">Nama</td>
+                    <td data-label="Lokasi" th:text="${report.location.name}">Lokasi</td>
+                    <td data-label="Status" th:text="${report.status.name() == 'OPEN' ? 'Terbuka' : (report.status.name() == 'CLAIMED' ? 'Diklaim' : 'Dikembalikan')}">Status</td>
+                    <td data-label="Aksi"><form class="admin-action-form" th:action="@{/admin/reports/{id}/delete(id=${report.id})}" method="post" onsubmit="return confirm('Hapus laporan ini beserta semua klaim terkait?')"><button class="button button-danger button-small" type="submit">Hapus</button></form></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-inline" th:if="${reports.isEmpty()}">Belum ada laporan untuk dimoderasi.</div>
+    </section>
+
+    <section id="pengguna" class="admin-section">
+        <div class="section-heading"><div><p class="eyebrow">AKSES KOMUNITAS</p><h2>Pengguna &amp; role</h2></div><span class="admin-count" th:text="${users.size() + ' pengguna'}">0 pengguna</span></div>
+        <div class="admin-table-wrap" th:if="${!users.isEmpty()}">
+            <table class="admin-table users-table">
+                <thead><tr><th>Pengguna</th><th>Email</th><th>Bergabung</th><th>Role</th><th>Aksi</th></tr></thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td data-label="Pengguna"><span class="admin-user-name"><span class="user-avatar" th:text="${#strings.substring(user.fullName, 0, 1)}">U</span><strong th:text="${user.fullName}">Nama pengguna</strong></span></td>
+                    <td data-label="Email" class="email-cell" th:text="${user.email}">email@kampus.ac.id</td>
+                    <td data-label="Bergabung" th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">Tanggal</td>
+                    <td data-label="Role"><span class="role-badge" th:classappend="${user.role.name() == 'ADMIN' ? ' role-admin' : ''}" th:text="${user.role.name()}">USER</span></td>
+                    <td data-label="Aksi">
+                        <form class="role-form" th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
+                            <select name="role" aria-label="Pilih role" th:disabled="${user.email == currentUser.email}">
+                                <option th:each="role : ${roles}" th:value="${role}" th:text="${role.name()}" th:selected="${user.role == role}">USER</option>
+                            </select>
+                            <button class="button button-outline button-small" type="submit" th:disabled="${user.email == currentUser.email}">Simpan</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="admin-footnote">Role akun yang sedang digunakan tidak dapat diubah dari dashboard ini.</p>
+    </section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Panel pengelolaan FindIt Campus.</span></footer>
+</body>
+</html>

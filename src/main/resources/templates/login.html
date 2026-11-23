@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Masuk — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="auth-layout">
+    <div class="auth-decoration"><span class="auth-star">✳</span><p class="eyebrow">SENANG MELIHATMU LAGI</p><h1>Barang baik selalu <em>menemukan jalan.</em></h1><p>Masuk untuk mengelola laporan dan mengikuti kabar klaimmu.</p></div>
+    <section class="auth-card"><div class="auth-card-heading"><span class="step-badge">F</span><div><h2>Selamat datang</h2><p>Masuk ke akun FindIt kamu.</p></div></div>
+        <div th:replace="~{fragments/alerts :: messages}"></div>
+        <form th:action="@{/login}" method="post" class="stack-form">
+            <label class="field"><span>Email kampus</span><input type="email" name="email" autocomplete="email" placeholder="nama@kampus.ac.id" required autofocus></label>
+            <label class="field"><span>Kata sandi</span><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></label>
+            <button type="submit" class="button button-primary button-full">Masuk <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch">Belum punya akun? <a th:href="@{/register}">Daftar gratis</a></p>
+    </section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Komunitas kampus, saling bantu.</span></footer>
+</body>
+</html>

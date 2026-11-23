@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${report.title + ' — FindIt Campus'}">Detail laporan — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="detail-layout">
+    <div class="detail-main">
+        <a class="back-link" th:href="@{/reports}">← Kembali ke laporan</a>
+        <div th:replace="~{fragments/alerts :: messages}"></div>
+        <div class="detail-illustration" th:classappend="${report.type.name() == 'FOUND' ? ' illustration-found' : ' illustration-lost'}"><span class="detail-object" th:text="${report.category.name() == 'ELECTRONICS' ? '⌁' : (report.category.name() == 'ID_CARDS' ? '▤' : (report.category.name() == 'KEYS' ? '⌘' : (report.category.name() == 'BAGS' ? '▱' : '✳')))}">✳</span><span class="report-type" th:text="${report.type.name() == 'FOUND' ? 'Barang ditemukan' : 'Barang hilang'}">Barang ditemukan</span></div>
+        <div class="detail-heading"><div class="report-meta"><span th:text="${report.category.label}">Kategori</span><span th:text="${report.status.name() == 'OPEN' ? '● Terbuka' : (report.status.name() == 'CLAIMED' ? '● Diklaim' : '● Dikembalikan')}">● Terbuka</span></div><h1 th:text="${report.title}">Judul laporan</h1></div>
+        <div class="detail-facts"><div><span class="fact-icon">⌖</span><span><small>Lokasi</small><strong th:text="${report.location.name}">Lokasi</strong></span></div><div><span class="fact-icon">◷</span><span><small>Waktu kejadian</small><strong th:text="${#temporals.format(report.occurredAt, 'dd MMM yyyy, HH:mm')}">Waktu</strong></span></div></div>
+        <section class="detail-description"><h2>Detail cerita</h2><p th:text="${report.description}">Deskripsi barang.</p></section>
+        <section class="owner-claims" th:if="${isOwner and !claims.isEmpty()}"><h2>Klaim untuk laporan ini</h2><article class="incoming-claim" th:each="claim : ${claims}"><div class="claim-topline"><strong th:text="${claim.claimant.fullName}">Nama pengklaim</strong><span class="claim-status" th:text="${claim.status.name()}">PENDING</span></div><p th:text="${claim.message}">Bukti kepemilikan.</p><div class="claim-actions" th:if="${claim.status.name() == 'PENDING' and report.status.name() == 'OPEN'}"><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="ACCEPTED"><button class="button button-primary button-small" type="submit">Setujui klaim</button></form><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="REJECTED"><button class="button button-outline button-small" type="submit">Tolak</button></form></div></article></section>
+    </div>
+    <aside class="detail-sidebar">
+        <div class="owner-card"><div class="owner-avatar" th:text="${#strings.substring(report.owner.fullName, 0, 1)}">F</div><div><small>Dilaporkan oleh</small><strong th:text="${report.owner.fullName}">Nama pelapor</strong></div></div>
+        <p class="privacy-note">Untuk menjaga privasi, hubungi pelapor melalui klaim FindIt. Jangan bagikan informasi pribadi di ruang publik.</p>
+        <div class="claim-box" th:if="${report.type.name() == 'FOUND' and report.status.name() == 'OPEN' and !isOwner}">
+            <h2>Ini barangmu?</h2><p>Ceritakan ciri khusus barang ini agar pemilik laporan dapat memverifikasi klaimmu.</p>
+            <div th:if="${currentUser == null}" class="claim-login"><a class="button button-primary button-full" th:href="@{/login}">Masuk untuk mengklaim</a><small>Belum punya akun? <a th:href="@{/register}">Daftar gratis</a></small></div>
+            <form th:if="${currentUser != null}" th:action="@{/reports/{id}/claims(id=${report.id})}" th:object="${claimForm}" method="post" class="stack-form"><label class="field"><span>Bukti kepemilikan</span><textarea th:field="*{message}" rows="4" maxlength="1200" placeholder="Contoh: Ada gantungan kecil berbentuk..." required></textarea></label><button class="button button-primary button-full" type="submit">Kirim klaim <span aria-hidden="true">→</span></button></form>
+        </div>
+        <div class="claim-box muted-box" th:if="${report.type.name() == 'FOUND' and report.status.name() != 'OPEN'}"><h2>Laporan sedang diproses</h2><p>Terima kasih, barang ini sudah memiliki klaim atau telah dikembalikan.</p></div>
+        <div class="claim-box muted-box" th:if="${report.type.name() == 'LOST'}"><h2>Menemukan barang ini?</h2><p>Buat laporan temuan baru dan sebutkan informasi ini agar pemiliknya bisa menemukannya.</p><a class="button button-outline button-full" th:href="@{/reports/new}">Laporkan barang temuan</a></div>
+        <form th:if="${isOwner and report.status.name() == 'CLAIMED'}" th:action="@{/reports/{id}/returned(id=${report.id})}" method="post"><button class="button button-primary button-full" type="submit">Tandai sudah dikembalikan ✓</button></form>
+    </aside>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Barang yang kembali, satu cerita baik lagi.</span></footer>
+</body>
+</html>

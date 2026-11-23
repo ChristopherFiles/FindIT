@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Klaim — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="page-shell">
+    <section class="page-intro"><p class="eyebrow">PANTAU PERKEMBANGAN</p><h1>Kabar <em>klaim.</em></h1><p>Lihat klaim yang kamu kirim dan verifikasi permintaan untuk barang temuanmu.</p></section>
+    <div th:replace="~{fragments/alerts :: messages}"></div>
+    <section class="claim-section"><div class="section-heading"><div><p class="eyebrow">KLAIM SAYA</p><h2>Barang yang saya klaim</h2></div></div>
+        <article class="claim-list-card" th:each="claim : ${myClaims}"><div class="claim-card-info"><span class="claim-status" th:text="${claim.status.name()}">PENDING</span><h3><a th:href="@{/reports/{id}(id=${claim.report.id})}" th:text="${claim.report.title}">Nama barang</a></h3><p th:text="${claim.message}">Bukti klaim</p><small>Pelapor: <span th:text="${claim.report.owner.fullName}">Nama</span></small></div></article>
+        <div class="empty-inline" th:if="${myClaims.isEmpty()}">Belum ada klaim yang kamu kirim. <a th:href="@{/reports}">Jelajahi barang temuan →</a></div>
+    </section>
+    <section class="claim-section"><div class="section-heading"><div><p class="eyebrow">PERLU TINDAKANMU</p><h2>Klaim barang temuanmu</h2></div></div>
+        <article class="claim-list-card incoming-card" th:each="claim : ${incomingClaims}"><div class="claim-card-info"><span class="claim-status" th:text="${claim.status.name()}">PENDING</span><h3><a th:href="@{/reports/{id}(id=${claim.report.id})}" th:text="${claim.report.title}">Nama barang</a></h3><p th:text="${claim.message}">Bukti klaim</p><small>Dari <strong th:text="${claim.claimant.fullName}">Nama pengklaim</strong></small></div>
+            <div class="claim-actions" th:if="${claim.status.name() == 'PENDING' and claim.report.status.name() == 'OPEN'}"><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="ACCEPTED"><button class="button button-primary button-small" type="submit">Setujui</button></form><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="REJECTED"><button class="button button-outline button-small" type="submit">Tolak</button></form></div>
+        </article>
+        <div class="empty-inline" th:if="${incomingClaims.isEmpty()}">Belum ada klaim untuk laporanmu.</div>
+    </section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Informasi terpusat. Pengembalian tetap terverifikasi.</span></footer>
+</body>
+</html>

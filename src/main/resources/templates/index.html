@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f6f1">
+    <meta name="description" content="Temukan barang hilang atau bantu kembalikan barang yang ditemukan di kampus.">
+    <title>FindIt Campus — Barangmu, jalan pulangnya.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main>
+    <section class="hero">
+        <div class="hero-copy">
+            <p class="eyebrow"><span class="status-dot"></span> Komunitas kampus, saling bantu</p>
+            <h1>Barangmu punya<br><em>jalan untuk pulang.</em></h1>
+            <p class="hero-description">Tempat sederhana untuk menemukan barang yang hilang dan mengembalikan barang yang tertinggal di kampus.</p>
+            <div class="hero-actions">
+                <a class="button button-primary" th:href="@{/reports}">Temukan barang <span aria-hidden="true">↗</span></a>
+                <a class="text-link" th:href="@{/reports/new}">Buat laporan <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="hero-proof"><span class="proof-avatar">F</span><span>Setiap barang punya cerita. Bantu temukan pemiliknya.</span></div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+            <div class="visual-sun"></div><div class="visual-orbit"></div>
+            <div class="visual-card">
+                <div class="visual-card-top"><span class="visual-icon">✳</span><span class="visual-found">DITEMUKAN</span></div>
+                <div class="visual-wallet"><span></span><i></i></div>
+                <div class="visual-line long"></div><div class="visual-line short"></div>
+                <div class="visual-meta"><span>Dompet kulit</span><span>📍 Perpustakaan</span></div>
+            </div>
+            <span class="floating-note note-top">Milik siapa, ya?</span>
+            <span class="floating-note note-bottom">Akhirnya ketemu ✨</span>
+        </div>
+    </section>
+    <section class="stats-strip" aria-label="Statistik FindIt">
+        <div><strong th:text="${reportCount}">0</strong><span>laporan komunitas</span></div>
+        <div><strong th:text="${foundCount}">0</strong><span>barang ditemukan</span></div>
+        <div><strong>1</strong><span>kampus yang saling peduli</span></div>
+    </section>
+    <section class="section-block recent-section">
+        <div class="section-heading">
+            <div><p class="eyebrow">DARI KOMUNITAS</p><h2>Barangkali ini yang kamu cari.</h2></div>
+            <a class="text-link" th:href="@{/reports}">Lihat semua <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="report-grid" th:if="${!reports.isEmpty()}">
+            <article class="report-card" th:each="report : ${reports}">
+                <div class="report-illustration" th:classappend="${report.type.name() == 'FOUND' ? ' illustration-found' : ' illustration-lost'}">
+                    <span class="category-icon" th:text="${report.category.name() == 'ELECTRONICS' ? '⌁' : (report.category.name() == 'ID_CARDS' ? '▤' : (report.category.name() == 'KEYS' ? '⌘' : (report.category.name() == 'BAGS' ? '▱' : '✳')))}">✳</span>
+                    <span class="report-type" th:text="${report.type.name() == 'FOUND' ? 'Ditemukan' : 'Hilang'}">Ditemukan</span>
+                </div>
+                <div class="report-card-body">
+                    <div class="report-meta"><span th:text="${report.category.label}">Kategori</span><span th:text="${report.status.name() == 'OPEN' ? '● Terbuka' : '● Diproses'}">● Terbuka</span></div>
+                    <h3><a th:href="@{/reports/{id}(id=${report.id})}" th:text="${report.title}">Judul barang</a></h3>
+                    <p class="report-location"><span aria-hidden="true">⌖</span> <span th:text="${report.location.name}">Lokasi</span></p>
+                </div>
+            </article>
+        </div>
+        <div class="empty-state" th:if="${reports.isEmpty()}"><span class="empty-icon">✳</span><h3>Belum ada laporan</h3><p>Jadi yang pertama membantu komunitas menemukan barang.</p><a class="button button-primary" th:href="@{/reports/new}">Buat laporan</a></div>
+    </section>
+    <section class="help-banner"><div><p class="eyebrow">BERSAMA LEBIH MUDAH</p><h2>Menemukan kembali dimulai dari satu laporan.</h2></div><a class="button button-light" th:href="@{/reports/new}">Bagikan laporan <span aria-hidden="true">↗</span></a></section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Komunitas kampus, saling bantu.</span><span>© 2026 FindIt Campus</span></footer>
+</body>
+</html>

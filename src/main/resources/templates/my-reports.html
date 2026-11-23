@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laporan saya — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="page-shell">
+    <section class="page-intro"><p class="eyebrow">RUANG PERSONAL</p><h1>Laporan <em>saya.</em></h1><p>Semua barang yang kamu bantu catat, ada di sini.</p></section>
+    <div class="results-heading"><span><strong th:text="${reports.size()}">0</strong> laporan dibuat</span><a class="button button-primary" th:href="@{/reports/new}">＋ Buat laporan</a></div>
+    <div class="report-grid" th:if="${!reports.isEmpty()}"><article class="report-card" th:each="report : ${reports}">
+        <div class="report-illustration" th:classappend="${report.type.name() == 'FOUND' ? ' illustration-found' : ' illustration-lost'}"><span class="category-icon">✳</span><span class="report-type" th:text="${report.type.name() == 'FOUND' ? 'Ditemukan' : 'Hilang'}">Jenis</span></div>
+        <div class="report-card-body"><div class="report-meta"><span th:text="${report.category.label}">Kategori</span><span th:text="${report.status.name() == 'OPEN' ? '● Terbuka' : (report.status.name() == 'CLAIMED' ? '● Diklaim' : '● Selesai')}">● Status</span></div><h3><a th:href="@{/reports/{id}(id=${report.id})}" th:text="${report.title}">Judul</a></h3><p class="report-location">⌖ <span th:text="${report.location.name}">Lokasi</span></p></div>
+    </article></div>
+    <div class="empty-state" th:if="${reports.isEmpty()}"><span class="empty-icon">✳</span><h3>Belum ada laporan darimu</h3><p>Bagikan barang yang hilang atau temuan pertamamu.</p><a class="button button-primary" th:href="@{/reports/new}">Buat laporan</a></div>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Terima kasih sudah saling membantu.</span></footer>
+</body>
+</html>

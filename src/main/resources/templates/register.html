@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buat akun — FindIt Campus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="auth-layout">
+    <div class="auth-decoration"><span class="auth-star">✳</span><p class="eyebrow">JADI BAGIAN DARI CERITA</p><h1>Kita saling bantu, <em>barang pun kembali.</em></h1><p>Buat akun untuk membagikan laporan dan mengklaim barang dengan aman.</p></div>
+    <section class="auth-card"><div class="auth-card-heading"><span class="step-badge">F</span><div><h2>Buat akun baru</h2><p>Hanya butuh beberapa detik.</p></div></div>
+        <div class="alert alert-error" th:if="${registrationError}" th:text="${registrationError}" role="alert"></div>
+        <form th:action="@{/register}" th:object="${registrationForm}" method="post" class="stack-form">
+            <label class="field"><span>Nama lengkap</span><input type="text" th:field="*{fullName}" autocomplete="name" maxlength="100" placeholder="Nama yang dikenal di kampus" required><small class="field-error" th:errors="*{fullName}"></small></label>
+            <label class="field"><span>Email</span><input type="email" th:field="*{email}" autocomplete="email" maxlength="180" placeholder="nama@kampus.ac.id" required><small class="field-error" th:errors="*{email}"></small></label>
+            <label class="field"><span>Kata sandi</span><input type="password" th:field="*{password}" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Minimal 8 karakter" required><small class="field-error" th:errors="*{password}"></small></label>
+            <button type="submit" class="button button-primary button-full">Buat akun <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch">Sudah punya akun? <a th:href="@{/login}">Masuk</a></p>
+    </section>
+</main>
+<footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Komunitas kampus, saling bantu.</span></footer>
+</body>
+</html>
