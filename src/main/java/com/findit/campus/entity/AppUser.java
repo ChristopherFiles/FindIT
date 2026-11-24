@@ -21,6 +21,12 @@ public class AppUser implements UserDetails {
     @Column(nullable = false, length = 100)
     private String fullName;
 
+    @Column(unique = true, length = 40)
+    private String nim;
+
+    @Column(length = 120)
+    private String studyProgram;
+
     @Column(nullable = false, unique = true, length = 180)
     private String email;
 
@@ -45,12 +51,30 @@ public class AppUser implements UserDetails {
 
     public Long getId() { return id; }
     public String getFullName() { return fullName; }
+    public String getNim() { return nim; }
+    public String getStudyProgram() { return studyProgram; }
     public String getEmail() { return email; }
     public UserRole getRole() { return role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public void updateProfile(String fullName, String nim, String studyProgram) {
+        this.fullName = fullName.trim();
+        this.nim = nim.trim();
+        this.studyProgram = studyProgram.trim();
+    }
+
+    public void updateAccount(String fullName, String nim, String studyProgram, String email, UserRole role) {
+        updateProfile(fullName, nim, studyProgram);
+        this.email = email.trim().toLowerCase(Locale.ROOT);
+        this.role = role;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
     @Override

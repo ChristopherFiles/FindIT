@@ -14,7 +14,7 @@
     <section class="auth-card"><div class="auth-card-heading"><span class="step-badge">F</span><div><h2>Selamat datang</h2><p>Masuk ke akun FindIt kamu.</p></div></div>
         <div th:replace="~{fragments/alerts :: messages}"></div>
         <form th:action="@{/login}" method="post" class="stack-form">
-            <label class="field"><span>Email kampus</span><input type="email" name="email" autocomplete="email" placeholder="nama@kampus.ac.id" required autofocus></label>
+            <label class="field"><span>Email atau username</span><input type="text" name="email" autocomplete="username" placeholder="nama@kampus.ac.id atau admin" required autofocus></label>
             <label class="field"><span>Kata sandi</span><input type="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required></label>
             <button type="submit" class="button button-primary button-full">Masuk <span aria-hidden="true">→</span></button>
         </form>

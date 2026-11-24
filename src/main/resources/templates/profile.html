@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profil saya — FindIt Campus</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="form-layout">
+    <div class="form-aside"><p class="eyebrow">AKUN FINDIT</p><h1>Kenali dirimu di <em>komunitas.</em></h1><p>Nama, NIM, dan program studi akan ditampilkan bersama laporanmu agar warga kampus mudah mengenali pelapor.</p></div>
+    <section class="form-card">
+        <div class="form-card-heading"><span class="step-badge">♙</span><div><h2>Edit profil</h2><p>Email akun: <strong th:text="${currentUser.email}">email</strong></p></div></div>
+        <div th:replace="~{fragments/alerts :: messages}"></div>
+        <div class="alert alert-error" th:if="${formError}" th:text="${formError}" role="alert"></div>
+        <form th:action="@{/profile}" th:object="${profileForm}" method="post" class="stack-form">
+            <label class="field"><span>Nama lengkap</span><input type="text" th:field="*{fullName}" maxlength="100" required><small class="field-error" th:errors="*{fullName}"></small></label>
+            <label class="field"><span>NIM</span><input type="text" th:field="*{nim}" maxlength="40" required><small class="field-error" th:errors="*{nim}"></small></label>
+            <label class="field"><span>Program studi</span><input type="text" th:field="*{studyProgram}" maxlength="120" required><small class="field-error" th:errors="*{studyProgram}"></small></label>
+            <div class="form-actions"><a class="text-link" th:href="@{/}">Batal</a><button type="submit" class="button button-primary">Simpan profil</button></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

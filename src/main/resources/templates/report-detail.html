@@ -13,14 +13,41 @@
     <div class="detail-main">
         <a class="back-link" th:href="@{/reports}">← Kembali ke laporan</a>
         <div th:replace="~{fragments/alerts :: messages}"></div>
-        <div class="detail-illustration" th:classappend="${report.type.name() == 'FOUND' ? ' illustration-found' : ' illustration-lost'}"><span class="detail-object" th:text="${report.category.name() == 'ELECTRONICS' ? '⌁' : (report.category.name() == 'ID_CARDS' ? '▤' : (report.category.name() == 'KEYS' ? '⌘' : (report.category.name() == 'BAGS' ? '▱' : '✳')))}">✳</span><span class="report-type" th:text="${report.type.name() == 'FOUND' ? 'Barang ditemukan' : 'Barang hilang'}">Barang ditemukan</span></div>
+        <div class="detail-illustration" th:classappend="${report.type.name() == 'FOUND' ? ' illustration-found' : ' illustration-lost'}"><img class="detail-report-image" th:if="${report.imagePath}" th:src="${report.imagePath}" alt="Gambar barang pada laporan"><span class="detail-object" th:unless="${report.imagePath}" th:text="${report.category.name() == 'ELECTRONICS' ? '⌁' : (report.category.name() == 'ID_CARDS' ? '▤' : (report.category.name() == 'KEYS' ? '⌘' : (report.category.name() == 'BAGS' ? '▱' : '✳')))}">✳</span><span class="report-type" th:text="${report.type.name() == 'FOUND' ? 'Barang ditemukan' : 'Barang hilang'}">Barang ditemukan</span></div>
         <div class="detail-heading"><div class="report-meta"><span th:text="${report.category.label}">Kategori</span><span th:text="${report.status.name() == 'OPEN' ? '● Terbuka' : (report.status.name() == 'CLAIMED' ? '● Diklaim' : '● Dikembalikan')}">● Terbuka</span></div><h1 th:text="${report.title}">Judul laporan</h1></div>
         <div class="detail-facts"><div><span class="fact-icon">⌖</span><span><small>Lokasi</small><strong th:text="${report.location.name}">Lokasi</strong></span></div><div><span class="fact-icon">◷</span><span><small>Waktu kejadian</small><strong th:text="${#temporals.format(report.occurredAt, 'dd MMM yyyy, HH:mm')}">Waktu</strong></span></div></div>
         <section class="detail-description"><h2>Detail cerita</h2><p th:text="${report.description}">Deskripsi barang.</p></section>
+        <section id="komentar" class="comments-section">
+            <div class="section-heading"><div><p class="eyebrow">DISKUSI</p><h2>Komentar</h2></div><span class="admin-count" th:text="${comments.size() + ' komentar'}">0 komentar</span></div>
+            <article class="comment-card" th:each="comment : ${comments}">
+                <div class="comment-heading"><strong th:text="${comment.author.fullName}">Nama</strong><span th:text="${#temporals.format(comment.createdAt, 'dd MMM yyyy, HH:mm')}">Tanggal</span></div>
+                <p class="comment-message" th:if="${comment.message}" th:text="${comment.message}">Komentar</p>
+                <img class="comment-image" th:if="${comment.imagePath}" th:src="${comment.imagePath}" alt="Gambar lampiran komentar">
+                <details class="comment-manage" th:if="${currentUser != null and (currentUser.role.name() == 'ADMIN' or comment.author.id == currentUser.id)}">
+                    <summary>Kelola komentar</summary>
+                    <form th:action="@{/comments/{id}/edit(id=${comment.id})}" method="post" enctype="multipart/form-data" class="stack-form">
+                        <label class="field"><span>Teks komentar</span><textarea name="message" rows="3" maxlength="1200" th:text="${comment.message}"></textarea></label>
+                        <label class="field"><span>Ganti/tambah gambar (JPG, PNG, GIF; maks. 5 MB)</span><input type="file" name="image" accept="image/jpeg,image/png,image/gif"></label>
+                        <button class="button button-outline button-small" type="submit">Simpan perubahan</button>
+                    </form>
+                    <form th:action="@{/comments/{id}/delete(id=${comment.id})}" method="post" class="comment-delete-form">
+                        <button class="button button-danger button-small" type="submit">Hapus komentar</button>
+                    </form>
+                </details>
+            </article>
+            <p class="empty-inline" th:if="${comments.isEmpty()}">Belum ada komentar pada laporan ini.</p>
+            <form th:if="${currentUser != null}" th:action="@{/reports/{id}/comments(id=${report.id})}" th:object="${commentForm}" method="post" enctype="multipart/form-data" class="stack-form comment-form">
+                <label class="field"><span>Tulis komentar</span><textarea th:field="*{message}" rows="3" maxlength="1200" placeholder="Tambahkan informasi yang membantu..."></textarea></label>
+                <label class="field"><span>Gambar (opsional, JPG/PNG/GIF maks. 5 MB)</span><input type="file" name="image" accept="image/jpeg,image/png,image/gif"></label>
+                <button class="button button-primary" type="submit">Kirim komentar</button>
+            </form>
+            <a th:if="${currentUser == null}" class="button button-outline" th:href="@{/login}">Masuk untuk berkomentar</a>
+        </section>
         <section class="owner-claims" th:if="${isOwner and !claims.isEmpty()}"><h2>Klaim untuk laporan ini</h2><article class="incoming-claim" th:each="claim : ${claims}"><div class="claim-topline"><strong th:text="${claim.claimant.fullName}">Nama pengklaim</strong><span class="claim-status" th:text="${claim.status.name()}">PENDING</span></div><p th:text="${claim.message}">Bukti kepemilikan.</p><div class="claim-actions" th:if="${claim.status.name() == 'PENDING' and report.status.name() == 'OPEN'}"><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="ACCEPTED"><button class="button button-primary button-small" type="submit">Setujui klaim</button></form><form th:action="@{/claims/{id}/decision(id=${claim.id})}" method="post"><input type="hidden" name="decision" value="REJECTED"><button class="button button-outline button-small" type="submit">Tolak</button></form></div></article></section>
     </div>
     <aside class="detail-sidebar">
-        <div class="owner-card"><div class="owner-avatar" th:text="${#strings.substring(report.owner.fullName, 0, 1)}">F</div><div><small>Dilaporkan oleh</small><strong th:text="${report.owner.fullName}">Nama pelapor</strong></div></div>
+        <div class="owner-card"><div class="owner-avatar" th:text="${#strings.substring(report.owner.fullName, 0, 1)}">F</div><div><small>Dilaporkan oleh</small><strong th:text="${report.owner.fullName}">Nama pelapor</strong><small th:if="${report.owner.nim}" th:text="${'NIM ' + report.owner.nim}"></small><small th:if="${report.owner.studyProgram}" th:text="${report.owner.studyProgram}"></small></div></div>
+        <div class="claim-box" th:if="${canManage}"><h2>Kelola laporan</h2><a class="button button-outline button-full" th:href="@{/reports/{id}/edit(id=${report.id})}">Edit laporan</a><form th:action="@{/reports/{id}/delete(id=${report.id})}" method="post" onsubmit="return confirm('Hapus laporan ini beserta komentar, klaim, dan notifikasi terkait?')"><button class="button button-danger button-full" type="submit">Hapus laporan</button></form></div>
         <p class="privacy-note">Untuk menjaga privasi, hubungi pelapor melalui klaim FindIt. Jangan bagikan informasi pribadi di ruang publik.</p>
         <div class="claim-box" th:if="${report.type.name() == 'FOUND' and report.status.name() == 'OPEN' and !isOwner}">
             <h2>Ini barangmu?</h2><p>Ceritakan ciri khusus barang ini agar pemilik laporan dapat memverifikasi klaimmu.</p>

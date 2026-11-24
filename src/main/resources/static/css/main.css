@@ -311,6 +311,59 @@ h1, h2, h3, .brand { font-family: 'Manrope', sans-serif; }
     .admin-table .role-form select { flex: 1; }
     .admin-section { padding-top: 27px; }
 }
+
+.report-card-image { position: absolute; width: 100%; height: 100%; inset: 0; object-fit: cover; }
+.detail-report-image { position: absolute; width: 100%; height: 100%; inset: 0; object-fit: contain; background: rgba(255,255,255,.35); }
+.report-upload-preview { width: min(100%, 360px); max-height: 260px; align-self: flex-start; object-fit: contain; border: 1px solid var(--line); border-radius: 7px; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+.report-author { display: flex; flex-wrap: wrap; gap: 2px; margin: 12px 0 0; color: var(--muted); font-size: 9px; }
+.detail-sidebar .claim-box + .claim-box { margin-top: 12px; }
+.claim-box form { margin-top: 10px; }
+.admin-chart-section { padding: 22px; background: white; border: 1px solid var(--line); border-radius: 10px; }
+.chart-period { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 10px; }
+.chart-period select { min-height: 36px; padding: 0 10px; color: var(--ink); background: #fbfcf9; border: 1px solid var(--line); border-radius: 6px; font-size: 10px; }
+.chart-wrap { width: 100%; }
+.chart-wrap canvas { display: block; width: 100%; height: 280px; }
+.admin-row-actions, .section-heading-actions { display: flex; align-items: center; gap: 7px; }
+.section-heading-actions { flex-wrap: wrap; justify-content: flex-end; }
+.admin-row-actions form { margin: 0; }
+.users-table { min-width: 900px; }
+.comments-section { padding: 22px 0; border-top: 1px solid var(--line); }
+.comments-section .section-heading { align-items: center; margin-bottom: 14px; }
+.comments-section .section-heading h2 { margin: 0; font-size: 21px; }
+.comment-card { margin: 10px 0; padding: 15px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+.comment-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 11px; }
+.comment-heading span { color: var(--muted); font-size: 9px; }
+.comment-message { margin: 10px 0 0; color: #596a62; font-size: 11px; line-height: 1.7; white-space: pre-line; }
+.comment-image { display: block; max-width: min(100%, 420px); max-height: 340px; margin-top: 12px; object-fit: contain; border-radius: 7px; }
+.comment-manage { margin-top: 12px; color: var(--muted); font-size: 10px; }
+.comment-manage summary { cursor: pointer; font-weight: 700; }
+.comment-manage .stack-form { margin-top: 12px; }
+.comment-delete-form { margin-top: 10px; }
+.comment-form { margin-top: 17px; padding: 16px; background: rgba(255,255,255,.55); border: 1px solid var(--line); border-radius: 8px; }
+.notification-link { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+.notification-badge { display: inline-grid; min-width: 17px; height: 17px; place-items: center; padding: 0 4px; color: white; background: #d74444; border-radius: 10px; font-size: 9px; line-height: 1; }
+.notification-list { display: grid; gap: 10px; }
+.notification-card { display: flex; align-items: center; gap: 14px; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 9px; }
+.notification-unread { border-left: 4px solid #d74444; }
+.notification-icon { color: var(--green); font-size: 20px; }
+.notification-content { flex: 1; }
+.notification-content p { margin: 0 0 5px; font-size: 12px; line-height: 1.6; }
+.notification-content small { color: var(--muted); font-size: 9px; }
+
+@media (max-width: 680px) {
+    .main-nav { justify-content: flex-start; gap: 15px; overflow-x: auto; white-space: nowrap; }
+    .main-nav a { flex: 0 0 auto; }
+    .admin-chart-section { padding: 16px 12px; }
+    .admin-chart-section .section-heading { align-items: flex-start; flex-direction: column; }
+    .chart-period { width: 100%; justify-content: space-between; }
+    .chart-period select { flex: 1; max-width: 220px; }
+    .section-heading-actions { justify-content: flex-start; }
+    .admin-row-actions { flex-wrap: wrap; }
+    .notification-card { align-items: flex-start; flex-wrap: wrap; padding: 13px; }
+    .notification-card form { width: 100%; }
+    .notification-card .button { width: 100%; }
 }

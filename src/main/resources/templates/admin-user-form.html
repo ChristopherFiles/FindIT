@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${editMode} ? 'Edit pengguna — FindIt Campus' : 'Tambah pengguna — FindIt Campus'">Pengguna — FindIt</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="form-layout">
+    <div class="form-aside"><p class="eyebrow">ADMIN FINDIT</p><h1>Kelola akun <em>pengguna.</em></h1><p>Gunakan data kampus yang benar. Perubahan akses akan mengakhiri sesi pengguna tersebut.</p></div>
+    <section class="form-card">
+        <div class="form-card-heading"><span class="step-badge">♙</span><div><h2 th:text="${editMode} ? 'Edit pengguna' : 'Tambah pengguna'">Pengguna</h2><p>Data identitas dan akses akun.</p></div></div>
+        <div class="alert alert-error" th:if="${formError}" th:text="${formError}" role="alert"></div>
+        <form th:action="${editMode} ? @{/admin/users/{id}(id=${userId})} : @{/admin/users}" th:object="${userForm}" method="post" class="stack-form">
+            <label class="field"><span>Nama lengkap</span><input type="text" th:field="*{fullName}" maxlength="100" required><small class="field-error" th:errors="*{fullName}"></small></label>
+            <label class="field"><span>Email</span><input type="email" th:field="*{email}" maxlength="180" required><small class="field-error" th:errors="*{email}"></small></label>
+            <div class="form-row">
+                <label class="field"><span>NIM</span><input type="text" th:field="*{nim}" maxlength="40" required><small class="field-error" th:errors="*{nim}"></small></label>
+                <label class="field"><span>Program studi</span><input type="text" th:field="*{studyProgram}" maxlength="120" required><small class="field-error" th:errors="*{studyProgram}"></small></label>
+            </div>
+            <label class="field"><span th:text="${editMode} ? 'Kata sandi baru (opsional)' : 'Kata sandi'">Kata sandi</span><input type="password" th:field="*{password}" minlength="8" maxlength="72" th:required="${!editMode}"><small class="field-error" th:errors="*{password}"></small></label>
+            <label class="field"><span>Role</span><select th:field="*{role}" required><option th:each="role : ${roles}" th:value="${role}" th:text="${role.name()}">USER</option></select><small class="field-error" th:errors="*{role}"></small></label>
+            <div class="form-actions"><a class="text-link" th:href="@{/admin#pengguna}">Batal</a><button type="submit" class="button button-primary">Simpan pengguna</button></div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

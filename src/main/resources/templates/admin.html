@@ -18,6 +18,12 @@
         <article class="admin-stat"><span class="admin-stat-icon">▤</span><div><strong th:text="${reportCount}">0</strong><small>Total laporan</small></div></article>
         <article class="admin-stat"><span class="admin-stat-icon">◷</span><div><strong th:text="${pendingClaimCount}">0</strong><small>Klaim menunggu</small></div></article>
     </section>
+    <section class="admin-section admin-chart-section">
+        <div class="section-heading"><div><p class="eyebrow">ANALITIK</p><h2>Tren laporan</h2></div>
+            <label class="chart-period"><span>Periode</span><select id="chartPeriod"><option value="daily">Harian · 7 hari</option><option value="monthly">Bulanan · 12 bulan</option><option value="yearly">Tahunan · 5 tahun</option></select></label>
+        </div>
+        <div class="chart-wrap"><canvas id="reportChart" role="img" aria-label="Grafik jumlah laporan"></canvas></div>
+    </section>
     <nav class="admin-anchor-nav" aria-label="Bagian dashboard"><a href="#laporan">Moderasi laporan</a><a href="#pengguna">Pengguna &amp; role</a></nav>
 
     <section id="laporan" class="admin-section">
@@ -32,7 +38,7 @@
                     <td data-label="Pelapor" th:text="${report.owner.fullName}">Nama</td>
                     <td data-label="Lokasi" th:text="${report.location.name}">Lokasi</td>
                     <td data-label="Status" th:text="${report.status.name() == 'OPEN' ? 'Terbuka' : (report.status.name() == 'CLAIMED' ? 'Diklaim' : 'Dikembalikan')}">Status</td>
-                    <td data-label="Aksi"><form class="admin-action-form" th:action="@{/admin/reports/{id}/delete(id=${report.id})}" method="post" onsubmit="return confirm('Hapus laporan ini beserta semua klaim terkait?')"><button class="button button-danger button-small" type="submit">Hapus</button></form></td>
+                    <td data-label="Aksi"><div class="admin-row-actions"><a class="button button-outline button-small" th:href="@{/reports/{id}/edit(id=${report.id})}">Edit</a><form class="admin-action-form" th:action="@{/admin/reports/{id}/delete(id=${report.id})}" method="post" onsubmit="return confirm('Hapus laporan ini beserta semua data terkait?')"><button class="button button-danger button-small" type="submit">Hapus</button></form></div></td>
                 </tr>
                 </tbody>
             </table>
@@ -41,23 +47,23 @@
     </section>
 
     <section id="pengguna" class="admin-section">
-        <div class="section-heading"><div><p class="eyebrow">AKSES KOMUNITAS</p><h2>Pengguna &amp; role</h2></div><span class="admin-count" th:text="${users.size() + ' pengguna'}">0 pengguna</span></div>
+        <div class="section-heading"><div><p class="eyebrow">AKSES KOMUNITAS</p><h2>Pengguna &amp; role</h2></div><div class="section-heading-actions"><span class="admin-count" th:text="${users.size() + ' pengguna'}">0 pengguna</span><a class="button button-primary button-small" th:href="@{/admin/users/new}">＋ Tambah pengguna</a></div></div>
         <div class="admin-table-wrap" th:if="${!users.isEmpty()}">
             <table class="admin-table users-table">
-                <thead><tr><th>Pengguna</th><th>Email</th><th>Bergabung</th><th>Role</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Pengguna</th><th>Email</th><th>NIM / Prodi</th><th>Bergabung</th><th>Role</th><th>Aksi</th></tr></thead>
                 <tbody>
                 <tr th:each="user : ${users}">
                     <td data-label="Pengguna"><span class="admin-user-name"><span class="user-avatar" th:text="${#strings.substring(user.fullName, 0, 1)}">U</span><strong th:text="${user.fullName}">Nama pengguna</strong></span></td>
                     <td data-label="Email" class="email-cell" th:text="${user.email}">email@kampus.ac.id</td>
+                    <td data-label="NIM / Prodi"><span th:text="${user.nim ?: '—'}">NIM</span><small class="table-subtext" th:text="${user.studyProgram ?: '—'}">Program studi</small></td>
                     <td data-label="Bergabung" th:text="${#temporals.format(user.createdAt, 'dd MMM yyyy')}">Tanggal</td>
                     <td data-label="Role"><span class="role-badge" th:classappend="${user.role.name() == 'ADMIN' ? ' role-admin' : ''}" th:text="${user.role.name()}">USER</span></td>
                     <td data-label="Aksi">
-                        <form class="role-form" th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
-                            <select name="role" aria-label="Pilih role" th:disabled="${user.email == currentUser.email}">
-                                <option th:each="role : ${roles}" th:value="${role}" th:text="${role.name()}" th:selected="${user.role == role}">USER</option>
-                            </select>
-                            <button class="button button-outline button-small" type="submit" th:disabled="${user.email == currentUser.email}">Simpan</button>
-                        </form>
+                        <div class="admin-row-actions" th:if="${user.id != currentUser.id}">
+                            <a class="button button-outline button-small" th:href="@{/admin/users/{id}/edit(id=${user.id})}">Edit</a>
+                            <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" onsubmit="return confirm('Hapus akun dan seluruh laporan/klaim pengguna ini?')"><button class="button button-danger button-small" type="submit">Hapus</button></form>
+                        </div>
+                        <span th:if="${user.id == currentUser.id}" class="table-subtext">Gunakan menu Profil</span>
                     </td>
                 </tr>
                 </tbody>
@@ -67,5 +73,53 @@
     </section>
 </main>
 <footer class="site-footer"><a class="brand footer-brand" th:href="@{/}"><span class="brand-mark">F</span><span>findit<span class="brand-dot">.</span><small> CAMPUS</small></span></a><span>Panel pengelolaan FindIt Campus.</span></footer>
+<script th:inline="javascript">
+    const reportChartData = {
+        daily: {labels: [[${dailyLabels}]], values: [[${dailyCounts}]]},
+        monthly: {labels: [[${monthLabels}]], values: [[${monthCounts}]]},
+        yearly: {labels: [[${yearLabels}]], values: [[${yearCounts}]]}
+    };
+    const chart = document.getElementById('reportChart');
+    const period = document.getElementById('chartPeriod');
+    function drawReportChart() {
+        const data = reportChartData[period.value];
+        const ratio = window.devicePixelRatio || 1;
+        const width = chart.clientWidth;
+        const height = 280;
+        chart.width = width * ratio;
+        chart.height = height * ratio;
+        const context = chart.getContext('2d');
+        context.scale(ratio, ratio);
+        context.clearRect(0, 0, width, height);
+        const left = 34, right = 12, top = 14, bottom = 38;
+        const plotWidth = width - left - right;
+        const plotHeight = height - top - bottom;
+        const maxValue = Math.max(1, ...data.values);
+        context.font = '12px sans-serif';
+        context.textAlign = 'center';
+        data.values.forEach((value, index) => {
+            const step = plotWidth / data.values.length;
+            const barWidth = Math.min(42, step * 0.62);
+            const barHeight = (value / maxValue) * (plotHeight - 22);
+            const x = left + index * step + (step - barWidth) / 2;
+            const y = top + plotHeight - barHeight;
+            context.fillStyle = '#438b75';
+            context.beginPath();
+            context.roundRect(x, y, barWidth, barHeight, 5);
+            context.fill();
+            context.fillStyle = '#53615d';
+            context.fillText(String(value), x + barWidth / 2, Math.max(top + 12, y - 6));
+            context.fillText(data.labels[index], x + barWidth / 2, height - 12);
+        });
+        context.strokeStyle = '#e5ece8';
+        context.beginPath();
+        context.moveTo(left, top + plotHeight);
+        context.lineTo(width - right, top + plotHeight);
+        context.stroke();
+    }
+    period.addEventListener('change', drawReportChart);
+    window.addEventListener('resize', drawReportChart);
+    drawReportChart();
+</script>
 </body>
 </html>

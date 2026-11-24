@@ -18,6 +18,9 @@ public class LostFoundReport {
     @Column(nullable = false, length = 3000)
     private String description;
 
+    @Column(length = 300)
+    private String imagePath;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ReportType type;
@@ -49,8 +52,15 @@ public class LostFoundReport {
 
     public LostFoundReport(String title, String description, ReportType type, ItemCategory category,
                            CampusLocation location, AppUser owner, LocalDateTime occurredAt) {
+        this(title, description, null, type, category, location, owner, occurredAt);
+    }
+
+    public LostFoundReport(String title, String description, String imagePath, ReportType type,
+                           ItemCategory category, CampusLocation location, AppUser owner,
+                           LocalDateTime occurredAt) {
         this.title = title;
         this.description = description;
+        this.imagePath = imagePath;
         this.type = type;
         this.category = category;
         this.location = location;
@@ -61,6 +71,7 @@ public class LostFoundReport {
     public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
+    public String getImagePath() { return imagePath; }
     public ReportType getType() { return type; }
     public ItemCategory getCategory() { return category; }
     public ReportStatus getStatus() { return status; }
@@ -71,5 +82,19 @@ public class LostFoundReport {
 
     public void setStatus(ReportStatus status) {
         this.status = status;
+    }
+
+    public void update(String title, String description, ReportType type, ItemCategory category,
+                       CampusLocation location, LocalDateTime occurredAt) {
+        this.title = title.trim();
+        this.description = description.trim();
+        this.type = type;
+        this.category = category;
+        this.location = location;
+        this.occurredAt = occurredAt;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

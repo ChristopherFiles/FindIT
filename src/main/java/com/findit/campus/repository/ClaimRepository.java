@@ -13,5 +13,6 @@ public interface ClaimRepository extends JpaRepository<ItemClaim, Long> {
     List<ItemClaim> findByReportIdAndStatus(Long reportId, ClaimStatus status);
     long countByStatus(ClaimStatus status);
     void deleteByReportId(Long reportId);
+    void deleteByClaimantId(Long claimantId);
     boolean existsByReportIdAndClaimantId(Long reportId, Long claimantId);
 }

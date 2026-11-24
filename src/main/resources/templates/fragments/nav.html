@@ -10,7 +10,11 @@
         <a th:href="@{/reports}">Jelajahi</a>
         <a th:if="${currentUser != null}" th:href="@{/my-reports}">Laporan saya</a>
         <a th:if="${currentUser != null}" th:href="@{/claims}">Klaim</a>
-        <a th:if="${currentUser != null and currentUser.role.name() == 'ADMIN'}" th:href="@{/admin}">Admin</a>
+        <a th:if="${currentUser != null}" th:href="@{/notifications}" class="notification-link" aria-label="Notifikasi">
+            <span aria-hidden="true">♧</span> Notifikasi
+            <span class="notification-badge" th:if="${unreadNotificationCount > 0}" th:text="${unreadNotificationCount}">0</span>
+        </a>
+        <a th:if="${currentUser != null}" th:href="@{/profile}">Profil</a>
     </nav>
     <div class="nav-actions">
         <a th:if="${currentUser == null}" class="nav-login" th:href="@{/login}">Masuk</a>

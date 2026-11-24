@@ -26,4 +26,16 @@ public class AccountService {
         }
         return users.save(new AppUser(fullName.trim(), normalizedEmail, passwordEncoder.encode(password)));
     }
+
+    @Transactional
+    public void updateProfile(AppUser currentUser, String fullName, String nim, String studyProgram) {
+        String normalizedNim = nim.trim();
+        if (users.existsByNimIgnoreCaseAndIdNot(normalizedNim, currentUser.getId())) {
+            throw new IllegalArgumentException("NIM tersebut sudah digunakan akun lain.");
+        }
+        AppUser persistedUser = users.findById(currentUser.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Akun tidak ditemukan."));
+        persistedUser.updateProfile(fullName, normalizedNim, studyProgram);
+        currentUser.updateProfile(fullName, normalizedNim, studyProgram);
+    }
 }

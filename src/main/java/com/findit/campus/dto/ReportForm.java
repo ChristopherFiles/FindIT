@@ -5,6 +5,7 @@ import com.findit.campus.entity.ReportType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -29,6 +30,8 @@ public class ReportForm {
     @NotNull
     private LocalDateTime occurredAt;
 
+    private MultipartFile image;
+
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
@@ -41,4 +44,6 @@ public class ReportForm {
     public void setLocationId(Long locationId) { this.locationId = locationId; }
     public LocalDateTime getOccurredAt() { return occurredAt; }
     public void setOccurredAt(LocalDateTime occurredAt) { this.occurredAt = occurredAt; }
+    public MultipartFile getImage() { return image; }
+    public void setImage(MultipartFile image) { this.image = image; }
 }

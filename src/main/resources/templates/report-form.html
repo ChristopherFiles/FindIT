@@ -2,7 +2,7 @@
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Buat laporan — FindIt Campus</title>
+    <title th:text="${editMode} ? 'Edit laporan — FindIt Campus' : 'Buat laporan — FindIt Campus'">Laporan — FindIt Campus</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/main.css}">
@@ -12,16 +12,18 @@
 <main class="form-layout">
     <div class="form-aside"><p class="eyebrow">BANTU KOMUNITAS</p><h1>Satu laporan bisa membuat <em>hari seseorang.</em></h1><p>Berikan detail yang cukup agar pemilik barang dapat mengenalinya. Demi keamanan, jangan cantumkan semua ciri khusus barang yang ditemukan.</p><div class="aside-tip"><span>✦</span><p><strong>Tips aman</strong><br>Simpan satu ciri unik sebagai bukti verifikasi saat pemilik mengajukan klaim.</p></div></div>
     <section class="form-card">
-        <div class="form-card-heading"><span class="step-badge">✳</span><div><h2>Buat laporan</h2><p>Semua kolom bertanda wajib diisi.</p></div></div>
+        <div class="form-card-heading"><span class="step-badge">✳</span><div><h2 th:text="${editMode} ? 'Edit laporan' : 'Buat laporan'">Buat laporan</h2><p>Semua kolom bertanda wajib diisi.</p></div></div>
         <div th:replace="~{fragments/alerts :: messages}"></div>
         <div class="alert alert-error" th:if="${formError}" th:text="${formError}" role="alert"></div>
-        <form th:action="@{/reports}" th:object="${reportForm}" method="post" class="stack-form">
+        <form th:action="${editMode} ? @{/reports/{id}/edit(id=${reportId})} : @{/reports}" th:object="${reportForm}" method="post" enctype="multipart/form-data" class="stack-form">
             <div class="form-row">
                 <label class="field"><span>Jenis laporan</span><select th:field="*{type}" required><option value="" disabled>Pilih jenis laporan</option><option th:each="type : ${reportTypes}" th:value="${type}" th:text="${type.name() == 'FOUND' ? 'Saya menemukan barang' : 'Saya kehilangan barang'}">Jenis</option></select><small class="field-error" th:errors="*{type}"></small></label>
                 <label class="field"><span>Kategori barang</span><select th:field="*{category}" required><option value="" disabled>Pilih kategori</option><option th:each="category : ${categories}" th:value="${category}" th:text="${category.label}">Kategori</option></select><small class="field-error" th:errors="*{category}"></small></label>
             </div>
             <label class="field"><span>Nama barang</span><input type="text" th:field="*{title}" placeholder="Contoh: Tumbler biru" maxlength="120" required><small class="field-error" th:errors="*{title}"></small></label>
             <label class="field"><span>Ceritakan detailnya</span><textarea th:field="*{description}" rows="5" maxlength="3000" placeholder="Warna, merek, kondisi, atau ciri yang membantu..." required></textarea><small class="field-error" th:errors="*{description}"></small></label>
+            <label class="field"><span>Gambar barang <small>(opsional; JPG, PNG, GIF; maksimal 5 MB)</small></span><input type="file" th:field="*{image}" accept="image/jpeg,image/png,image/gif"><small class="field-error" th:errors="*{image}"></small></label>
+            <img class="report-upload-preview" th:if="${currentImagePath}" th:src="${currentImagePath}" alt="Gambar laporan saat ini">
             <div class="form-row">
                 <label class="field"><span>Lokasi</span><select th:field="*{locationId}" required><option value="" disabled>Pilih area kampus</option><option th:each="location : ${locations}" th:value="${location.id}" th:text="${location.name}">Lokasi</option></select><small class="field-error" th:errors="*{locationId}"></small></label>
                 <label class="field"><span>Waktu kejadian</span><input type="datetime-local" th:field="*{occurredAt}" required><small class="field-error" th:errors="*{occurredAt}"></small></label>

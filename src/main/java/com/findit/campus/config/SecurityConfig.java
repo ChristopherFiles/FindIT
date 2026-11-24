@@ -1,6 +1,7 @@
 package com.findit.campus.config;
 
 import com.findit.campus.repository.UserRepository;
+import com.findit.campus.entity.UserRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,7 +26,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/css/**", "/login", "/register", "/error").permitAll()
+                        .requestMatchers("/", "/css/**", "/uploads/**", "/login", "/register", "/error").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/reports/new", "/laporan/buat").authenticated()
                         .requestMatchers(HttpMethod.GET, "/reports", "/reports/*", "/laporan/*").permitAll()
@@ -55,8 +56,17 @@ public class SecurityConfig {
 
     @Bean
     UserDetailsService userDetailsService(UserRepository users) {
-        return email -> users.findByEmail(email.toLowerCase(Locale.ROOT))
-                .orElseThrow(() -> new UsernameNotFoundException("Akun tidak ditemukan."));
+        return username -> {
+            if ("admin".equalsIgnoreCase(username)) {
+                if (users.countByRole(UserRole.ADMIN) != 1) {
+                    throw new UsernameNotFoundException("Username admin tidak tersedia.");
+                }
+                return users.findFirstByRoleOrderByCreatedAtAsc(UserRole.ADMIN)
+                        .orElseThrow(() -> new UsernameNotFoundException("Akun admin tidak ditemukan."));
+            }
+            return users.findByEmail(username.toLowerCase(Locale.ROOT))
+                    .orElseThrow(() -> new UsernameNotFoundException("Akun tidak ditemukan."));
+        };
     }
 
     @Bean

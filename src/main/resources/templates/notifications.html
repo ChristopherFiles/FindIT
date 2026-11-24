@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notifikasi — FindIt Campus</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: siteNav}"></div>
+<main class="page-shell">
+    <section class="page-intro"><p class="eyebrow">PEMBARUAN UNTUKMU</p><h1>Notifikasi <em>FindIt.</em></h1><p>Kami memberi tahu jika ada temuan yang mungkin cocok dengan barang hilangmu.</p></section>
+    <div th:replace="~{fragments/alerts :: messages}"></div>
+    <section class="notification-list" th:if="${!notifications.isEmpty()}">
+        <article class="notification-card" th:each="notification : ${notifications}" th:classappend="${notification.read ? '' : ' notification-unread'}">
+            <span class="notification-icon" aria-hidden="true">♧</span>
+            <div class="notification-content"><p th:text="${notification.message}">Ada temuan yang mungkin cocok.</p><small th:text="${#temporals.format(notification.createdAt, 'dd MMM yyyy, HH:mm')}">Tanggal</small></div>
+            <form th:action="@{/notifications/{id}/read(id=${notification.id})}" method="post"><button class="button button-outline button-small" type="submit">Lihat laporan</button></form>
+        </article>
+    </section>
+    <div class="empty-state" th:if="${notifications.isEmpty()}"><span class="empty-icon">♧</span><h3>Belum ada notifikasi</h3><p>Notifikasi kecocokan akan muncul di sini.</p><a class="button button-outline" th:href="@{/reports}">Jelajahi laporan</a></div>
+</main>
+</body>
+</html>
